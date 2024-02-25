@@ -1,5 +1,5 @@
-import React from 'react';
-import { Inbox, File, Send, ArchiveX, Trash2, Archive } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { Inbox, File, Send, ArchiveX, Trash2, Archive } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -14,20 +14,23 @@ import {
   Legend,
   Line,
   Label,
-} from 'recharts';
-import { Label as ShadLabel } from '@/components/ui/label';
-import { useDispatch, useSelector } from 'react-redux';
-import { format } from 'date-fns';
+} from "recharts";
+import { Label as ShadLabel } from "@/components/ui/label";
+import { useDispatch, useSelector } from "react-redux";
+import { format } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuItem,
-} from './ui/dropdown-menu';
-import { Input } from './ui/input';
-import { getCallEntries } from '@/Redux/actions/stats';
+} from "./ui/dropdown-menu";
+import { Input } from "./ui/input";
+import { getCallEntries } from "@/Redux/actions/stats";
 
 const Dashboard = () => {
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
+  const [campaignId, setCampaignId] = useState();
   const campaignIds = Array.from(
     { length: 20 },
     (_, index) => `campaign_${index + 1}`
@@ -35,17 +38,27 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const { callEntry } = useSelector((state) => state.callEntry);
   const CampaignHandler = (e) => {
-    dispatch(getCallEntries({ campaignId: e.target.innerText }));
+    setCampaignId(e.target.innerText);
   };
+  const handleChangeStartDate = (e) => {
+    setStartDate(e.target.value);
+  };
+  const handleChangeEndDate = (e) => {
+    setEndDate(e.target.value);
+  };
+
+  useEffect(() => {
+    dispatch(getCallEntries({ campaignId, startDate, endDate }));
+  }, [campaignId, startDate, endDate]);
   return (
     <>
-      <div className='flex flex-row justify-between'>
-        <div className='group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2'>
+      <div className="flex flex-row justify-between">
+        <div className="group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2">
           <div>
             <DropdownMenu>
               <DropdownMenuTrigger>Campaign Id</DropdownMenuTrigger>
               <DropdownMenuContent
-                className={'flex flex-col flex-wrap overflow-auto'}
+                className={"flex flex-col flex-wrap overflow-auto"}
               >
                 {campaignIds.map((id) => (
                   <DropdownMenuItem key={id} onClick={CampaignHandler}>
@@ -56,44 +69,44 @@ const Dashboard = () => {
             </DropdownMenu>
           </div>
           <div>
-            <ShadLabel htmlFor='email'>From</ShadLabel>
-            <Input type={'date'} />
-            <ShadLabel htmlFor='email'>To</ShadLabel>
-            <Input type={'date'} />
+            <ShadLabel htmlFor="email">From</ShadLabel>
+            <Input type={"date"} onChange={handleChangeStartDate} />
+            <ShadLabel htmlFor="email">To</ShadLabel>
+            <Input type={"date"} onChange={handleChangeEndDate} />
           </div>
         </div>
-        <ResponsiveContainer width='100%' height={350}>
+        <ResponsiveContainer width="100%" height={350}>
           <BarChart data={callEntry}>
             <XAxis
               dataKey={`createdAt`}
-              stroke='#888888'
+              stroke="#888888"
               fontSize={12}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              stroke='#888888'
+              stroke="#888888"
               fontSize={12}
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => `${value}`}
             />
             <Bar
-              dataKey='minutes'
-              fill='currentColor'
+              dataKey="minutes"
+              fill="currentColor"
               radius={[4, 4, 0, 0]}
-              className='fill-primary'
+              className="fill-primary"
             />
           </BarChart>
-          <PieChart>
+          {/* <PieChart>
             <Pie
               data={categoryData}
-              dataKey='calls'
-              nameKey='name'
-              cx='50%'
-              cy='50%'
+              dataKey="calls"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
               outerRadius={100}
-              fill='currentColor'
+              fill="currentColor"
               label={({ name, calls }) => `${name}: ${calls}`}
             />
           </PieChart>
@@ -101,10 +114,10 @@ const Dashboard = () => {
             <Tooltip />
             <Pie
               data={statusData}
-              dataKey='calls'
+              dataKey="calls"
               outerRadius={100}
               innerRadius={70}
-              fill='currentColor'
+              fill="currentColor"
               label={({ name, calls }) => `${name}: ${calls}`}
             />
           </PieChart>
@@ -114,13 +127,13 @@ const Dashboard = () => {
             data={stats}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='createdAt' />
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="createdAt" />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type='monotone' dataKey='calls' stroke='#000' />
-          </LineChart>
+            <Line type="monotone" dataKey="calls" stroke="#000" />
+          </LineChart> */}
         </ResponsiveContainer>
       </div>
     </>
